@@ -1,8 +1,8 @@
 <?php
 
-$hostname = 'localhost';
-$usuario = 'root';
-$senha = '';
+$hostname = 'sql309.infinityfree.com';
+$usuario = 'if0_38361506';
+$senha = 'gsrSTDRILEHQaE';
 $database = 'restaurante';
 
 $mysqli = new mysqli($hostname, $usuario, $senha, $database);
