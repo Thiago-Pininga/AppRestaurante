@@ -47,7 +47,6 @@ table {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
-
 /* Estilização do formulário */
 form {
     display: flex;
@@ -98,4 +97,54 @@ form button:hover {
 
 .mensagem.erro {
     color: red;
+}
+
+/* Estilo para a página de Relatório */
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+/* Estilização da Tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Estilo para o Total */
+.total {
+    margin-top: 30px; /* Aumentando o espaçamento para dar mais destaque */
+    text-align: right; /* Alinhando à direita */
+    font-size: 1.5rem; /* Aumentando o tamanho da fonte */
+    font-weight: bold;
+    color: #333;
+    background-color: #f1f1f1; /* Adicionando um fundo suave */
+    padding: 15px; /* Dando mais espaço ao redor do total */
+    border-radius: 8px; /* Adicionando borda arredondada */
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1); /* Adicionando sombra para destacar */
+}
+
+/* Opcional: Estilo para garantir que o total se ajuste bem em dispositivos móveis */
+@media (max-width: 768px) {
+    .total {
+        font-size: 1.2rem; /* Ajuste no tamanho da fonte para telas pequenas */
+        text-align: center; /* Alinhando o total ao centro em dispositivos móveis */
+        padding: 12px;
+    }
 }

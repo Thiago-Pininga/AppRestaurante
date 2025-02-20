@@ -17,6 +17,15 @@ body {
 
 h1 {
     text-align: center;
+    font-size: 30px;
+    color: #333;
+}
+
+h2{
+    text-align: center;
+    font-size: larger;
+    font-weight: bold;
+    padding: 3rem 0;
     color: #333;
 }
 

@@ -4,6 +4,19 @@ include 'conexao.php';
 // Consulta para buscar todos os produtos
 $sql = "SELECT * FROM produtos";
 $result = $mysqli->query($sql);
+
+// Separar produtos por tipo (comida e bebida)
+$bebidas = [];
+$comidas = [];
+
+while ($produto = $result->fetch_assoc()) {
+    // Verifica se o produto é comida ou bebida, baseando-se no campo 'e_comida'
+    if ($produto['e_comida'] == 1) {
+        $comidas[] = $produto; // Produto é comida
+    } else {
+        $bebidas[] = $produto; // Produto é bebida
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -59,8 +72,11 @@ $result = $mysqli->query($sql);
 
     <div class="container">
         <h1>Produtos</h1>
+
+        <!-- Bebidas -->
+        <h2>Bebidas</h2>
         <div class="cards-produtos">
-            <?php while ($produto = $result->fetch_assoc()) : ?>
+            <?php foreach ($bebidas as $produto) : ?>
                 <div class="produto" data-id="<?= $produto['id'] ?>">
                     <div class="produto-imagem">
                         <?php if (!empty($produto['imagem'])): ?>
@@ -79,7 +95,32 @@ $result = $mysqli->query($sql);
                         <button class="btn-incrementar" onclick="alterarQuantidade(<?= $produto['id'] ?>, 1)">+</button>
                     </div>
                 </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
+        </div>
+
+        <!-- Comidas -->
+        <h2>Comidas</h2>
+        <div class="cards-produtos">
+            <?php foreach ($comidas as $produto) : ?>
+                <div class="produto" data-id="<?= $produto['id'] ?>">
+                    <div class="produto-imagem">
+                        <?php if (!empty($produto['imagem'])): ?>
+                            <img src="<?= $produto['imagem'] ?>" alt="<?= htmlspecialchars($produto['nome']) ?>">
+                        <?php else: ?>
+                            <img src="imagens/default.png" alt="Imagem padrão">
+                        <?php endif; ?>
+                    </div>
+                    <h3><?= htmlspecialchars($produto['nome']) ?></h3>
+                    <p>Quantidade Inicial: <?= $produto['quantidade_inicial'] ?></p>
+                    <p>Valor: R$ <?= number_format($produto['valor'], 2, ',', '.') ?></p>
+
+                    <div class="contador-vendido">
+                        <button class="btn-decrementar" onclick="alterarQuantidade(<?= $produto['id'] ?>, -1)">-</button>
+                        <span class="contador"><?= $produto['vendidos'] ?></span>
+                        <button class="btn-incrementar" onclick="alterarQuantidade(<?= $produto['id'] ?>, 1)">+</button>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
