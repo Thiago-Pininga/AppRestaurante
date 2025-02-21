@@ -41,10 +41,10 @@ $sqlGraph = "
             LPAD(FLOOR(MINUTE(rv.horario) / 30) * 30, 2, '0')
         ) AS intervalo,
         p.e_comida,
-        SUM(rv.quantidade) AS quantidade_vendida
+        MAX(rv.quantidade) AS quantidade_vendida
     FROM registro_vendas rv
     JOIN produtos p ON rv.produto_id = p.id
-    WHERE rv.horario >= NOW() - INTERVAL 24 HOUR
+    WHERE DATE(rv.horario) = CURDATE()  -- Filtra apenas as vendas de hoje
     GROUP BY intervalo, p.e_comida
     ORDER BY intervalo ASC
 ";

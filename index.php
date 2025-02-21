@@ -20,7 +20,7 @@ $result = $mysqli->query($sql);
     <style>
         /* Classe para destacar produtos com estoque baixo */
         .alerta-estoque {
-            background-color: #ffcccc; /* Fundo vermelho claro */
+            background-color: #ffcccc !important; /* Fundo vermelho claro */
         }
     </style>
 </head>

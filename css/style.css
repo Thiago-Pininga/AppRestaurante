@@ -104,13 +104,15 @@ nav ul li a.active {
     header .container {
         flex-direction: column;
         text-align: center;
+        gap: 30px;
     }
     nav ul {
         margin-top: 10px;
         flex-direction: column;
+        gap: 300px;
     }
     nav ul li {
-        margin: 5px 0;
+        margin:30px;
     }
     .container {
         width: 95%;
