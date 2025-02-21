@@ -30,7 +30,6 @@ while ($produto = $result->fetch_assoc()) {
     <script>
         // Função para atualizar a quantidade vendida de todos os produtos
         function atualizarQuantidades() {
-            // Obtém todos os produtos com id e quantidade vendidos
             let produtos = document.querySelectorAll('.produto');
             let dados = [];
 
@@ -41,12 +40,9 @@ while ($produto = $result->fetch_assoc()) {
                 dados.push({ id: id, vendidos: vendidos });
             });
 
-            // Envia os dados via AJAX para atualizar no banco
             fetch('atualizar_quantidades.php', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
             })
             .then(response => response.json())
@@ -59,19 +55,56 @@ while ($produto = $result->fetch_assoc()) {
             });
         }
 
-        </script>
+        // Função para registrar vendas automaticamente a cada 10 minutos
+        function registrarVendaAutomatica() {
+            let produtos = document.querySelectorAll('.produto');
+            produtos.forEach(produto => {
+                let id = produto.getAttribute('data-id');
+                let vendidos = produto.querySelector('.contador').textContent;
+
+                fetch('registrar_venda.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `produto_id=${id}&quantidade=${vendidos}`
+                })
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch(error => console.error('Erro:', error));
+            });
+        }
+
+        setInterval(registrarVendaAutomatica, 600); // 10 minutos
+
+        function alterarQuantidade(id, valor) {
+            let contador = document.querySelector(`.produto[data-id="${id}"] .contador`);
+            let quantidadeVendida = parseInt(contador.textContent);
+            quantidadeVendida += valor;
+            if (quantidadeVendida < 0) quantidadeVendida = 0;
+            contador.textContent = quantidadeVendida;
+
+            fetch('alterar_quantidade.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, vendidos: quantidadeVendida })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.log('Erro ao atualizar a quantidade.');
+                }
+            });
+        }
+    </script>
 </head>
 <body>
-
     <?php
-    $pagina = 'Produtos'; // Página ativa
-    include 'header.php'; // Inclui o header com o menu
+    $pagina = 'Produtos';
+    include 'header.php';
     ?>
 
     <div class="container">
         <h1>Produtos</h1>
 
-        <!-- Bebidas -->
         <h2>Bebidas</h2>
         <div class="cards-produtos">
             <?php foreach ($bebidas as $produto) : ?>
@@ -86,7 +119,6 @@ while ($produto = $result->fetch_assoc()) {
                     <h3><?= htmlspecialchars($produto['nome']) ?></h3>
                     <p>Quantidade Inicial: <?= $produto['quantidade_inicial'] ?></p>
                     <p>Valor: R$ <?= number_format($produto['valor'], 2, ',', '.') ?></p>
-
                     <div class="contador-vendido">
                         <button class="btn-decrementar" onclick="alterarQuantidade(<?= $produto['id'] ?>, -1)">-</button>
                         <span class="contador"><?= $produto['vendidos'] ?></span>
@@ -96,7 +128,6 @@ while ($produto = $result->fetch_assoc()) {
             <?php endforeach; ?>
         </div>
 
-        <!-- Comidas -->
         <h2>Comidas</h2>
         <div class="cards-produtos">
             <?php foreach ($comidas as $produto) : ?>
@@ -111,7 +142,6 @@ while ($produto = $result->fetch_assoc()) {
                     <h3><?= htmlspecialchars($produto['nome']) ?></h3>
                     <p>Quantidade Inicial: <?= $produto['quantidade_inicial'] ?></p>
                     <p>Valor: R$ <?= number_format($produto['valor'], 2, ',', '.') ?></p>
-
                     <div class="contador-vendido">
                         <button class="btn-decrementar" onclick="alterarQuantidade(<?= $produto['id'] ?>, -1)">-</button>
                         <span class="contador"><?= $produto['vendidos'] ?></span>
@@ -121,38 +151,5 @@ while ($produto = $result->fetch_assoc()) {
             <?php endforeach; ?>
         </div>
     </div>
-
-    <script>
-        // Função para alterar a quantidade vendida
-        function alterarQuantidade(id, valor) {
-            let contador = document.querySelector(`.produto[data-id="${id}"] .contador`);
-            let quantidadeVendida = parseInt(contador.textContent);
-
-            // Atualiza o contador com o valor alterado
-            quantidadeVendida += valor;
-            if (quantidadeVendida < 0) quantidadeVendida = 0;
-
-            contador.textContent = quantidadeVendida;
-
-            // Envia a alteração para o banco de dados
-            fetch('alterar_quantidade.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    id: id,
-                    vendidos: quantidadeVendida
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.log('Erro ao atualizar a quantidade.');
-                }
-            });
-        }
-    </script>
-
 </body>
 </html>
