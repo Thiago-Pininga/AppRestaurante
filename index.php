@@ -17,6 +17,12 @@ $result = $mysqli->query($sql);
     <title>Lista de Produtos</title>
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Classe para destacar produtos com estoque baixo */
+        .alerta-estoque {
+            background-color: #ffcccc; /* Fundo vermelho claro */
+        }
+    </style>
 </head>
 <body>
 
@@ -30,22 +36,24 @@ $result = $mysqli->query($sql);
                     <th>Tipo</th>
                     <th>Quantidade Inicial</th>
                     <th>Vendidos</th>
-                    <th>Valor (R$)</th>
-                    <th>Ações</th> <!-- Coluna de ações -->
+                    <th>Estoque Atual</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while ($produto = $result->fetch_assoc()) : ?>
-                    <tr>
+                <?php while ($produto = $result->fetch_assoc()) : 
+                    $estoque_atual = $produto['quantidade_inicial'] - $produto['vendidos'];
+                    // Aplica a classe se o estoque atual for menor ou igual ao estoque mínimo
+                    $classe = ($estoque_atual <= $produto['estoque_minimo']) ? 'alerta-estoque' : '';
+                ?>
+                    <tr class="<?= $classe ?>">
                         <td><?= $produto['id'] ?></td>
                         <td><?= htmlspecialchars($produto['nome']) ?></td>
-                        <!-- Exibe 'Comida' ou 'Bebida' com base no valor de e_comida -->
                         <td><?= $produto['e_comida'] == 1 ? 'Comida' : 'Bebida' ?></td>
                         <td><?= $produto['quantidade_inicial'] ?></td>
                         <td><?= $produto['vendidos'] ?></td>
-                        <td>R$ <?= number_format($produto['valor'], 2, ',', '.') ?></td>
+                        <td><?= $estoque_atual ?></td>
                         <td>
-                            <!-- Botões de editar e excluir -->
                             <a href="editar.php?id=<?= $produto['id'] ?>" class="btn-editar">Editar</a>
                             <a href="excluir.php?id=<?= $produto['id'] ?>" class="btn-excluir" onclick="return confirm('Tem certeza que deseja excluir este produto?')">Excluir</a>
                         </td>

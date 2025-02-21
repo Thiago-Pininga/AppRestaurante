@@ -7,37 +7,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $e_comida = ($_POST['tipo'] == 'comida') ? 1 : 0; // 1 para comida, 0 para bebida
     $quantidade_inicial = $_POST['quantidade_inicial'];
     $valor = $_POST['valor'];
+    $estoque_minimo = $_POST['estoque_minimo']; // Novo campo
     $imagem = '';
 
     // Verifica se o usuário optou por carregar uma imagem
     if (!empty($_FILES['imagem']['name'])) {
-        // Obtém o nome da imagem
-        $imagem_nome = $_FILES['imagem']['name'];
-        $imagem_nome = strtolower(str_replace(" ", "_", $imagem_nome));
-        
-        // Define o diretório e o caminho
+        $imagem_nome = strtolower(str_replace(" ", "_", $_FILES['imagem']['name']));
         $diretorio = 'imagens/';
         $caminho_imagem = $diretorio . $nome . '.' . pathinfo($imagem_nome, PATHINFO_EXTENSION);
 
-        // Move a imagem para o diretório
         if (move_uploaded_file($_FILES['imagem']['tmp_name'], $caminho_imagem)) {
-            $imagem = $caminho_imagem; // Armazena o caminho no banco
+            $imagem = $caminho_imagem;
         } else {
             $mensagem = "Erro ao fazer upload da imagem.";
         }
     } elseif (!empty($_POST['link_imagem'])) {
-        // Se for link de imagem, armazena o link
         $imagem = $_POST['link_imagem'];
     }
 
     // Prepara a consulta para inserir o produto no banco
-    $sql = "INSERT INTO produtos (nome, e_comida, quantidade_inicial, valor, imagem) 
-            VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO produtos (nome, e_comida, quantidade_inicial, valor, estoque_minimo, imagem) 
+            VALUES (?, ?, ?, ?, ?, ?)";
 
     if ($stmt = $mysqli->prepare($sql)) {
-        $stmt->bind_param("ssiis", $nome, $e_comida, $quantidade_inicial, $valor, $imagem);
+        $stmt->bind_param("ssiiss", $nome, $e_comida, $quantidade_inicial, $valor, $estoque_minimo, $imagem);
 
-        // Executa a consulta
         if ($stmt->execute()) {
             $mensagem = "Produto adicionado com sucesso!";
         } else {
@@ -63,18 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     <?php
     $pagina = 'Adicionar'; // Página ativa
-    include 'header.php'; // Inclui o header com o menu
+    include 'header.php';
     ?>
 
     <div class="container">
         <h1>Adicionar Novo Produto</h1>
 
-        <!-- Exibe a mensagem se houver -->
         <?php if (isset($mensagem)): ?>
             <p class="mensagem"><?= $mensagem ?></p>
         <?php endif; ?>
 
-        <!-- Formulário de Adicionar Produto -->
         <form action="adicionar.php" method="POST" enctype="multipart/form-data">
             <label for="nome">Nome:</label>
             <input type="text" name="nome" id="nome" required>
@@ -88,10 +80,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label for="quantidade_inicial">Quantidade Inicial:</label>
             <input type="number" name="quantidade_inicial" id="quantidade_inicial" required>
 
+            <label for="estoque_minimo">Estoque Mínimo:</label>
+            <input type="number" name="estoque_minimo" id="estoque_minimo" required>
+
             <label for="valor">Valor (R$):</label>
             <input type="text" name="valor" id="valor" required>
 
-            <!-- Opção de adicionar imagem -->
             <label for="imagem">Imagem do Produto:</label>
             <input type="file" name="imagem" id="imagem" accept="image/*">
 

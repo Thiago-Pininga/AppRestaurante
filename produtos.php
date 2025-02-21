@@ -59,9 +59,7 @@ while ($produto = $result->fetch_assoc()) {
             });
         }
 
-        // Atualiza as quantidades a cada 10 segundos
-        setInterval(atualizarQuantidades, 10000);
-    </script>
+        </script>
 </head>
 <body>
 
