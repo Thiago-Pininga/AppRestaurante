@@ -96,7 +96,7 @@ while ($produto = $result->fetch_assoc()) {
             produtosAlterados = {};
         }
 
-        setInterval(registrarVendaAutomatica, 600); // 10 minutos
+        setInterval(registrarVendaAutomatica, 3000); // 10 minutos
     </script>
 </head>
 <body>
