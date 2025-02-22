@@ -28,60 +28,21 @@ while ($produto = $result->fetch_assoc()) {
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
     <script>
-        // Função para atualizar a quantidade vendida de todos os produtos
-        function atualizarQuantidades() {
-            let produtos = document.querySelectorAll('.produto');
-            let dados = [];
-
-            produtos.forEach(produto => {
-                let id = produto.getAttribute('data-id');
-                let vendidos = produto.querySelector('.contador').textContent;
-
-                dados.push({ id: id, vendidos: vendidos });
-            });
-
-            fetch('atualizar_quantidades.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(dados)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Quantidades atualizadas com sucesso!');
-                } else {
-                    console.log('Erro ao atualizar quantidades.');
-                }
-            });
-        }
-
-        // Função para registrar vendas automaticamente a cada 10 minutos
-        function registrarVendaAutomatica() {
-            let produtos = document.querySelectorAll('.produto');
-            produtos.forEach(produto => {
-                let id = produto.getAttribute('data-id');
-                let vendidos = produto.querySelector('.contador').textContent;
-
-                fetch('registrar_venda.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `produto_id=${id}&quantidade=${vendidos}`
-                })
-                .then(response => response.text())
-                .then(data => console.log(data))
-                .catch(error => console.error('Erro:', error));
-            });
-        }
-
-        setInterval(registrarVendaAutomatica, 600); // 10 minutos
-
+        let contadores = {}; // Objeto para armazenar os contadores temporários
+        let produtosAlterados = {}; // Objeto para armazenar os produtos alterados
+        
         function alterarQuantidade(id, valor) {
-            let contador = document.querySelector(`.produto[data-id="${id}"] .contador`);
+            let produto = document.querySelector(`.produto[data-id="${id}"]`);
+            let contador = produto.querySelector('.contador');
             let quantidadeVendida = parseInt(contador.textContent);
             quantidadeVendida += valor;
             if (quantidadeVendida < 0) quantidadeVendida = 0;
             contador.textContent = quantidadeVendida;
 
+            // Atualiza a lista de produtos alterados
+            produtosAlterados[id] = quantidadeVendida;
+
+            // Envia a atualização via AJAX
             fetch('alterar_quantidade.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -93,7 +54,49 @@ while ($produto = $result->fetch_assoc()) {
                     console.log('Erro ao atualizar a quantidade.');
                 }
             });
+
+            // Atualizar contador de mudanças temporárias
+            if (!contadores[id]) {
+                contadores[id] = { quantidade: 0, timer: null, elemento: null };
+            }
+            contadores[id].quantidade += valor;
+            
+            if (!contadores[id].elemento) {
+                let contadorElemento = document.createElement('div');
+                contadorElemento.className = 'contador-temp';
+                produto.appendChild(contadorElemento);
+                contadores[id].elemento = contadorElemento;
+            }
+            
+            contadores[id].elemento.textContent = `+${contadores[id].quantidade}x`;
+            
+            if (contadores[id].timer) clearTimeout(contadores[id].timer);
+            contadores[id].timer = setTimeout(() => {
+                contadores[id].elemento.remove();
+                delete contadores[id];
+            }, 5000);
         }
+
+        function registrarVendaAutomatica() {
+            // Envia os produtos alterados para o servidor
+            for (let id in produtosAlterados) {
+                let vendidos = produtosAlterados[id];
+
+                fetch('registrar_venda.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `produto_id=${id}&quantidade=${vendidos}`
+                })
+                .then(response => response.text())
+                .then(data => console.log('Venda registrada:', data))
+                .catch(error => console.error('Erro ao registrar venda:', error));
+            }
+
+            // Limpa os produtos alterados após o registro
+            produtosAlterados = {};
+        }
+
+        setInterval(registrarVendaAutomatica, 600); // 10 minutos
     </script>
 </head>
 <body>
