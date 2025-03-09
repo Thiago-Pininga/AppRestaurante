@@ -6,7 +6,7 @@ if (!isset($pagina)) {
 
 <header>
     <div class="container">
-        <h1>Rango De Mãe</h1>
+        <h1></h1>
         <nav>
             <ul>
                 <li><a href="index.php" class="<?= ($pagina == 'Início') ? 'active' : '' ?>">Início</a></li>
