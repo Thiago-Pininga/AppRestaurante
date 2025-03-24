@@ -17,7 +17,6 @@ $sqlTable = "
         valor,
         (vendidos * valor) AS total_item
     FROM produtos p
-    GROUP BY id
     ORDER BY e_comida ASC, nome ASC
 ";
 $resultTable = $mysqli->query($sqlTable);
@@ -33,20 +32,19 @@ while ($row = $resultTable->fetch_assoc()) {
 // DADOS PARA O GRÁFICO
 // =====================
 
-// Consulta para obter os dados de vendas da tabela registro_vendas dos últimos 24h, agrupados em intervalos de 30 minutos
+// Consulta para obter os dados de vendas dos últimos 24h agrupados por intervalos de 30 minutos
 $sqlGraph = "
     SELECT 
         CONCAT(
-            DATE_FORMAT(DATE_SUB(rv.horario, INTERVAL MINUTE(rv.horario) % 30 MINUTE), '%Y-%m-%d %H:'), 
+            DATE_FORMAT(DATE_SUB(rv.horario, INTERVAL MINUTE(rv.horario) % 30 MINUTE), '%Y-%m-%d %H:'),
             LPAD(FLOOR(MINUTE(rv.horario) / 30) * 30, 2, '0')
         ) AS intervalo,
         p.e_comida,
-        MAX(rv.quantidade) AS quantidade_vendida
+        rv.quantidade AS quantidade_vendida
     FROM registro_vendas rv
     JOIN produtos p ON rv.produto_id = p.id
-    WHERE DATE(rv.horario) = CURDATE()  -- Filtra apenas as vendas de hoje
-    GROUP BY intervalo, p.e_comida
-    ORDER BY intervalo ASC
+    WHERE DATE(rv.horario) = CURDATE()
+    ORDER BY rv.horario ASC;
 ";
 $resultGraph = $mysqli->query($sqlGraph);
 
@@ -61,36 +59,21 @@ while ($row = $resultGraph->fetch_assoc()) {
     }
 }
 
-// Cria uma linha do tempo unificada com todos os intervalos
+// Cria uma linha do tempo unificada
 $all_intervals = array_unique(array_merge(array_keys($dados_comida), array_keys($dados_bebida)));
 sort($all_intervals);
 
-// Preenche os intervalos que não possuem registro com o último valor conhecido
-$filled_comida = [];
-$filled_bebida = [];
-$prev_comida = 0;
-$prev_bebida = 0;
-foreach ($all_intervals as $intv) {
-    $current_comida = isset($dados_comida[$intv]) ? $dados_comida[$intv] : $prev_comida;
-    $filled_comida[$intv] = $current_comida;
-    $prev_comida = $current_comida;
-    
-    $current_bebida = isset($dados_bebida[$intv]) ? $dados_bebida[$intv] : $prev_bebida;
-    $filled_bebida[$intv] = $current_bebida;
-    $prev_bebida = $current_bebida;
-}
-
-// Calcula os incrementos (diferença entre o valor cumulativo atual e o anterior) para cada intervalo
+// Preenche os intervalos que não possuem registro
 $incrementos_comida = [];
 $incrementos_bebida = [];
 $prev_comida = 0;
 $prev_bebida = 0;
 foreach ($all_intervals as $intv) {
-    $current_comida = $filled_comida[$intv];
+    $current_comida = $dados_comida[$intv] ?? $prev_comida;
     $incrementos_comida[] = $current_comida - $prev_comida;
     $prev_comida = $current_comida;
-    
-    $current_bebida = $filled_bebida[$intv];
+
+    $current_bebida = $dados_bebida[$intv] ?? $prev_bebida;
     $incrementos_bebida[] = $current_bebida - $prev_bebida;
     $prev_bebida = $current_bebida;
 }
@@ -104,16 +87,13 @@ foreach ($all_intervals as $intv) {
   <title>Relatório de Vendas</title>
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/style.css">
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container my-4">
     <h1>Relatório de Vendas</h1>
-    
-    <!-- Tabela de Vendas -->
+
     <h2>Tabela de Vendas</h2>
     <table class="table table-bordered">
       <thead>
@@ -140,15 +120,9 @@ foreach ($all_intervals as $intv) {
     <div class="mb-3">
       <h3>Total de Vendas: R$ <?= number_format($total_vendas, 2, ',', '.') ?></h3>
     </div>
-    
-    <!-- Botão Finalizar Dia -->
-    <form action="finalizar_dia.php" method="POST" class="mb-4">
-      <button type="submit" class="btn btn-danger" onclick="return confirm('Tem certeza que deseja encerrar o dia?')">Finalizar o Dia</button>
-    </form>
-    
-    <!-- Gráfico de Vendas Incrementais -->
+
     <h2>Gráfico de Vendas Incrementais (30 minutos)</h2>
-    <canvas id="graficoVendasIntervalos" width="400" height="200"></canvas>
+    <canvas id="graficoVendasIntervalos"></canvas>
     <script>
       var ctx = document.getElementById('graficoVendasIntervalos').getContext('2d');
       var grafico = new Chart(ctx, {
@@ -177,30 +151,13 @@ foreach ($all_intervals as $intv) {
           options: {
               responsive: true,
               scales: {
-                  x: {
-                      title: {
-                          display: true,
-                          text: 'Intervalo (30 minutos)'
-                      },
-                      ticks: {
-                          maxRotation: 90,
-                          minRotation: 45
-                      }
-                  },
-                  y: {
-                      beginAtZero: true,
-                      title: {
-                          display: true,
-                          text: 'Vendas Incrementais'
-                      }
-                  }
+                  x: { title: { display: true, text: 'Intervalo (30 minutos)' } },
+                  y: { beginAtZero: true, title: { display: true, text: 'Vendas Incrementais' } }
               }
           }
       });
     </script>
   </div>
-  
-  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
