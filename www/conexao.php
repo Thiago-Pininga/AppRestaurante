@@ -1,8 +1,8 @@
 <?php
 
-$hostname = 'db';
-$usuario = 'user';
-$senha = 'password';
+$hostname = 'localhost';
+$usuario = 'root';
+$senha = '';
 $database = 'restaurante';
 
 $mysqli = new mysqli($hostname, $usuario, $senha, $database);

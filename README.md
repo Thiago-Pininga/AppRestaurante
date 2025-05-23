@@ -46,7 +46,16 @@
 2. Inicie Apache e MySQL no XAMPP.
 3. Copie o projeto para a pasta `htdocs`.
 4. Acesse o phpMyAdmin (`http://localhost/phpmyadmin`), crie um banco chamado `restaurante` e importe o arquivo `restaurante.sql` que está dentro da pasta `docker-entrypoint-initdb.d`.
-5. No navegador, acesse:  
+5. Mude os dados do arquivo de [conexão](./www/conexao.php) para:
+
+   ``` 
+   $hostname = 'localhost';
+   $usuario = 'root';
+   $senha = '';
+   $database = 'restaurante';
+   ```
+
+6. No navegador, acesse:  
    `http://localhost/nome-da-pasta-do-projeto`
 
 ---
@@ -63,6 +72,15 @@
    docker-compose down -v  # apaga os volumes antigos
    docker-compose up --build
    ```
+5. Mude os dados do arquivo de [conexão](./www/conexao.php) para:
+
+   ``` 
+   $hostname = 'db';
+   $usuario = 'user';
+   $senha = 'password';
+   $database = 'restaurante';
+   ```
+
 3. Acesse o sistema no navegador:
 
    ```http://localhost:8080```
