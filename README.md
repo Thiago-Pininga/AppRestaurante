@@ -34,31 +34,35 @@
 - Validação dos dados enviados pelo usuário antes de salvá-los no banco de dados.
 - Tratamento adequado de erros e exibição de mensagens de sucesso ou falha.
 
-## 🚀 Instalação e Configuração do XAMPP para o Projeto
+---
+
+## ⚙️ Rodando o Projeto com XAMPP
 
 ### 📋 Pré-requisitos:
-- Ter o XAMPP instalado no seu computador. [Baixar aqui](https://www.apachefriends.org/pt_br/index.html)
+- Ter o XAMPP instalado. [Download aqui](https://www.apachefriends.org/pt_br/index.html)
 
-### 📝 Instalando e Configurando o XAMPP:
-1. **📥 Instalação do XAMPP:**
-   - Faça o download e instale o XAMPP seguindo as instruções do site oficial.
+### 🚀 Passos:
+1. Instale o XAMPP.
+2. Inicie Apache e MySQL no XAMPP.
+3. Copie o projeto para a pasta `htdocs`.
+4. Acesse o phpMyAdmin (`http://localhost/phpmyadmin`), crie um banco chamado `restaurante` e importe o arquivo `restaurante.sql` que está dentro da pasta `docker-entrypoint-initdb.d`.
+5. No navegador, acesse:  
+   `http://localhost/nome-da-pasta-do-projeto`
 
-2. **🟢 Iniciando o XAMPP:**
-   - Abra o Painel de Controle do XAMPP e inicie o servidor Apache e o MySQL.
+---
 
-3. **📂 Clonando o Projeto:**
-   - Faça o download do código fonte do projeto pelo GitHub: [AppRestaurante](https://github.com/Thiago-Pininga/AppRestaurante)
-   - Extraia o conteúdo baixado e copie a pasta do projeto para o diretório `htdocs` do XAMPP. Geralmente localizado em:  
-     - `C:\xampp\htdocs\` (Windows)  
-     - `/opt/lampp/htdocs/` (Linux)
+## 🐳 Rodando o Projeto com Docker
 
-4. **📊 Criando o Banco de Dados:**
-   - Acesse o phpMyAdmin abrindo o navegador e indo até: `http://localhost/phpmyadmin`
-   - Crie um novo banco de dados chamado `restaurante` (ou outro nome da sua escolha).
-   - Importe o arquivo `restaurante.sql` incluído na pasta do projeto para criar as tabelas necessárias.
+### 📋 Pré-requisitos:
+- Docker e Docker Compose instalados. [Download aqui](https://www.docker.com/products/docker-desktop)
 
+### 🚀 Passos:
+1. Clone ou baixe este repositório.
+2. No terminal, acesse a pasta do projeto e execute:
+   ```
+   docker-compose down -v  # apaga os volumes antigos
+   docker-compose up --build
+   ```
+3. Acesse o sistema no navegador:
 
-5. **🌐 Acessando o Projeto:**
-   - No navegador, digite: `http://localhost/AppRestaurante` (ou o nome que você deu à pasta do projeto).
-
-🎉 Pronto! Agora o projeto está configurado e rodando localmente usando o XAMPP. Para acessar as funcionalidades, basta navegar pelas páginas do sistema.
+   ```http://localhost:8080```
