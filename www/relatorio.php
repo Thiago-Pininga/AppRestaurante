@@ -121,6 +121,15 @@ foreach ($all_intervals as $intv) {
       <h3>Total de Vendas: R$ <?= number_format($total_vendas, 2, ',', '.') ?></h3>
     </div>
 
+    <div style="margin: 20px 0; text-align: right;">
+        <form action="finalizar_dia.php" method="post" onsubmit="return confirm('Deseja realmente finalizar o dia?');">
+            <button type="submit" class="finalizar-dia-btn">
+                Finalizar Dia
+            </button>
+        </form>
+    </div>
+
+
     <h2>Gráfico de Vendas Incrementais (30 minutos)</h2>
     <canvas id="graficoVendasIntervalos"></canvas>
     <script>
