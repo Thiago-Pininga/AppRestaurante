@@ -1,15 +1,15 @@
 <?php
 // Normal para XAMPP    
-$hostname = 'localhost';
-$usuario = 'root';
-$senha = '';
-$database = 'restaurante';
+// $hostname = 'localhost';
+// $usuario = 'root';
+// $senha = '';
+// $database = 'restaurante';
 
 // Normal para Docker
-// $hostname = 'db';
-// $usuario = 'user';
-// $senha = 'password';
-// $database = 'restaurante';
+$hostname = 'db';
+$usuario = 'user';
+$senha = 'password';
+$database = 'restaurante';
 
 $mysqli = new mysqli($hostname, $usuario, $senha, $database);
 

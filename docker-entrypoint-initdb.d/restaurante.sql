@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 21/02/2025 às 18:40
+-- Tempo de geração: 27/09/2025 às 22:45
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -51,6 +51,18 @@ CREATE TABLE `registro_vendas` (
   `horario` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
+  `usuario` varchar(50) NOT NULL,
+  `senha` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Índices para tabelas despejadas
 --
@@ -69,6 +81,13 @@ ALTER TABLE `registro_vendas`
   ADD KEY `produto_id` (`produto_id`);
 
 --
+-- Índices de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `usuario` (`usuario`);
+
+--
 -- AUTO_INCREMENT para tabelas despejadas
 --
 
@@ -83,6 +102,12 @@ ALTER TABLE `produtos`
 --
 ALTER TABLE `registro_vendas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restrições para tabelas despejadas
