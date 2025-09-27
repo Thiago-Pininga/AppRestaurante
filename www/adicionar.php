@@ -1,4 +1,10 @@
 <?php
+session_start();
+if (!isset($_SESSION['usuario']) && !isset($_COOKIE['usuario'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include 'conexao.php';
 
 // Verifica se o formulário foi enviado

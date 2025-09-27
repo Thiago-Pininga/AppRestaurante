@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Se não estiver logado, redireciona para login
+if (!isset($_SESSION['usuario']) && !isset($_COOKIE['usuario'])) {
+    header("Location: login.php");
+    exit;
+}
+
 include 'conexao.php';
 
 $pagina = 'Início'; // Define qual página está ativa
