@@ -1,0 +1,42 @@
+name: Deploy do Projeto Docker na AWS
+
+on:
+  push:
+    branches:
+      - main
+      - staging # Dispara o deploy quando há push para main ou staging
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Chave SSH Privada
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          # Usa o segredo que acabamos de criar
+          ssh-private-key: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+          
+      - name: Deploy e Build na EC2
+        # 🚨 MUDAR AQUI: Substitua pelos seus dados reais 🚨
+        run: |
+          SSH_USER="ec2-user" # OU ubuntu, dependendo da sua imagem
+          SERVER_IP="SEU_IP_PUBLICO_DA_AWS" # O IP da sua instância EC2
+          TARGET_DIR="/home/$SSH_USER/restaurante-app" 
+
+          echo "Copiando arquivos para $SERVER_IP:$TARGET_DIR..."
+          # Cria a pasta remota e copia o código (ignora a checagem de host key)
+          ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP "mkdir -p $TARGET_DIR"
+          scp -r -o StrictHostKeyChecking=no * $SSH_USER@$SERVER_IP:$TARGET_DIR
+
+          echo "Executando Docker Compose na EC2..."
+          # Entra na EC2 e executa os comandos Docker
+          ssh -o StrictHostKeyChecking=no $SSH_USER@$SERVER_IP << EOF
+            cd $TARGET_DIR
+            docker compose pull || true
+            # Sobe os serviços, reconstruindo o APP e reiniciando tudo
+            docker compose up -d --build
+            echo "Deploy concluído com sucesso!"
+          EOF
